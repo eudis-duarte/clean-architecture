@@ -86,7 +86,7 @@ class ArchitectureTest {
     fun `services implementation should be in domain_service`() {
         Konsist
             .scopeFromProject()
-            .interfaces()
+            .classes()
             .withNameEndingWith("ServiceImpl")
             .assertTrue { it.resideInPackage("$DOMAIN_PACKAGE.service") }
     }
@@ -94,27 +94,108 @@ class ArchitectureTest {
     @Test
     fun `only Services implementation should be in domain_service`() {
         Konsist
-            .scopeFromProject()
-            .interfaces()
+            .scopeFromProduction()
+            .classes()
             .withPackage("$DOMAIN_PACKAGE.service")
             .assertTrue { it.hasNameEndingWith("ServiceImpl") }
     }
 
+    /*
+        @CreatedDate
+        @Column(name = "created_at", nullable = false, updatable = false)
+        var createdAt: LocalDateTime? = null,
+        @LastModifiedDate
+        @Column(name = "updated_at", nullable = false)
+        var updatedAt: LocalDateTime? = null,
+     */
     @Test
     fun `Data classes should only use val modifier`() {
-        Konsist.scopeFromProduction()
+        Konsist
+            .scopeFromProduction()
             .classes()
             .withModifier(KoModifier.DATA) // las classes de config no deberían ser Data
             .properties(includeNested = true, includeLocal = true)
             .withoutName("createdAt", "updatedAt") // cuando usamos @CreatedDate y/o @LastModifiedDate
             .assertTrue { it.hasValModifier }
     }
+
+    /*
+    // No usar ApiException en el Domain
+    class BadRequestNotAllowedException : CoreException(
+        BadRequestNotAllowed.CODE,
+        BadRequestNotAllowed.MESSAGE
+    )
+     */
+    @Test
+    fun `domain should not use http imports`() {
+        Konsist
+            .scopeFromProject()
+            .files
+            .withPackage("$DOMAIN_PACKAGE..")
+            .assertFalse {
+                it.hasImport { import -> import.hasNameContaining("http") }
+            }
+    }
+
+    @Test
+    fun `classes in Domain should not have JsonNaming annotation`() {
+        Konsist
+            .scopeFromProduction()
+            .classes()
+            .withPackage("$DOMAIN_PACKAGE..")
+            .assertFalse {
+                it.hasAnnotation { annotation -> annotation.hasNameStartingWith("JsonNaming") }
+            }
+    }
+
+    @Test
+    fun `controllers should not use service directly`() {
+        Konsist
+            .scopeFromProject()
+            .files
+            .withPackage("$APPLICATION_PACKAGE..")
+            .assertFalse {
+                it.hasImport { import -> import.hasNameContaining("$DOMAIN_PACKAGE.service.") }
+            }
+    }
+
+//    @Test
+//    fun `Only models map to entities should be in model_domain`() {
+//        val listEntities = mutableListOf<String>()
+//        Konsist
+//            .scopeFromProject()
+//            .classes()
+//            .withPackage("$INFRASTRUCTURE_PACKAGE.persistence.entity")
+//            .map {
+//                listEntities.add(it.name)
+//            }
+//
+//        Konsist
+//            .scopeFromProject()
+//            .classes()
+//            .withPackage("$DOMAIN_PACKAGE.model")
+//            .assertTrue {
+//                "${it.name}Entity" in listEntities
+//            }
+//    }
+//
+//    @Test
+//    fun `domain should not use jackson imports`() {
+//        Konsist
+//            .scopeFromProject()
+//            .files
+//            .withPackage("$DOMAIN_PACKAGE..")
+//            .assertFalse {
+//                it.hasImport { import -> import.hasNameContaining("jackson") }
+//            }
+//    }
+//
+//    @Test
+//    fun `services should have only one public function`() {
+//        Konsist
+//            .scopeFromProduction()
+//            .classes()
+//            .withPackage("$DOMAIN_PACKAGE.service")
+//            .assertTrue { c -> c.countFunctions { f -> f.hasPublicOrDefaultModifier } == 1 }
+//    }
 }
-/*
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    var createdAt: LocalDateTime? = null,
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime? = null,
- */
