@@ -1,10 +1,14 @@
 package com.rappi.pay.pse
 
+import com.lemonappdev.konsist.api.KoModifier
 import com.lemonappdev.konsist.api.Konsist
 import com.lemonappdev.konsist.api.architecture.KoArchitectureCreator.assertArchitecture
 import com.lemonappdev.konsist.api.architecture.Layer
+import com.lemonappdev.konsist.api.ext.list.modifierprovider.withModifier
+import com.lemonappdev.konsist.api.ext.list.properties
 import com.lemonappdev.konsist.api.ext.list.withNameEndingWith
 import com.lemonappdev.konsist.api.ext.list.withPackage
+import com.lemonappdev.konsist.api.ext.list.withoutName
 import com.lemonappdev.konsist.api.verify.assertFalse
 import com.lemonappdev.konsist.api.verify.assertTrue
 import org.junit.jupiter.api.Test
@@ -95,4 +99,22 @@ class ArchitectureTest {
             .withPackage("$DOMAIN_PACKAGE.service")
             .assertTrue { it.hasNameEndingWith("ServiceImpl") }
     }
+
+    @Test
+    fun `Data classes should only use val modifier`() {
+        Konsist.scopeFromProduction()
+            .classes()
+            .withModifier(KoModifier.DATA) // las classes de config no deberían ser Data
+            .properties(includeNested = true, includeLocal = true)
+            .withoutName("createdAt", "updatedAt") // cuando usamos @CreatedDate y/o @LastModifiedDate
+            .assertTrue { it.hasValModifier }
+    }
 }
+/*
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime? = null,
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    var updatedAt: LocalDateTime? = null,
+ */
