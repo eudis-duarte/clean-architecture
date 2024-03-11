@@ -1,7 +1,9 @@
 package com.rappi.pay.pse.infrastructure.adapter
 
-class RedisAdapter {
-    fun saveUserId(userId: Long) {
+import com.rappi.pay.pse.domain.port.output.CachePort
+
+class RedisAdapter : CachePort {
+    override fun saveUserId(userId: Long) {
         println("userId $userId saved")
     }
 }
