@@ -1,12 +1,12 @@
 package com.rappi.pay.pse.domain.service
 
 import com.rappi.pay.pse.domain.port.input.PSEPaymentQueryService
-import org.springframework.beans.factory.annotation.Value
+import com.rappi.pay.pse.domain.port.output.ConfigValuePort
 
 class PSEPaymentQueryServiceImpl(
-    @Value("\${pse-constant.num-payments}") private val numPayments: Long,
+    private val configValuePort: ConfigValuePort,
 ) : PSEPaymentQueryService {
     override fun getPayment() {
-        println("numPayments = $numPayments")
+        println("numPayments = ${configValuePort.getNumPayments()}")
     }
 }

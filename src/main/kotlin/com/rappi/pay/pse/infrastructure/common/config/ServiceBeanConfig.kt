@@ -2,6 +2,7 @@ package com.rappi.pay.pse.infrastructure.common.config
 
 import com.rappi.pay.pse.domain.port.output.AccountPort
 import com.rappi.pay.pse.domain.port.output.CachePort
+import com.rappi.pay.pse.domain.port.output.ConfigValuePort
 import com.rappi.pay.pse.domain.port.output.NotificationPort
 import com.rappi.pay.pse.domain.port.output.PSEPaymentPort
 import com.rappi.pay.pse.domain.port.output.UserPort
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class ServiceBeanConfig {
     @Bean
-    fun buildPSEPaymentQueryService(numPayments: Long) = PSEPaymentQueryServiceImpl(numPayments)
+    fun buildPSEPaymentQueryService(configValuePort: ConfigValuePort) = PSEPaymentQueryServiceImpl(configValuePort)
 
     @Bean
     fun buildRegisterPSEPaymentService(
