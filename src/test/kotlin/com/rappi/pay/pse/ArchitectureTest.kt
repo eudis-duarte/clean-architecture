@@ -82,7 +82,7 @@ class ArchitectureTest {
     fun `services implementation should be in domain_service`() {
         Konsist
             .scopeFromProject()
-            .interfaces()
+            .classes()
             .withNameEndingWith("ServiceImpl")
             .assertTrue { it.resideInPackage("$DOMAIN_PACKAGE.service") }
     }
@@ -90,8 +90,8 @@ class ArchitectureTest {
     @Test
     fun `only Services implementation should be in domain_service`() {
         Konsist
-            .scopeFromProject()
-            .interfaces()
+            .scopeFromProduction()
+            .classes()
             .withPackage("$DOMAIN_PACKAGE.service")
             .assertTrue { it.hasNameEndingWith("ServiceImpl") }
     }
