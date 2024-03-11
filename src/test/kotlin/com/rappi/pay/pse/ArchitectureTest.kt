@@ -3,8 +3,10 @@ package com.rappi.pay.pse
 import com.lemonappdev.konsist.api.Konsist
 import com.lemonappdev.konsist.api.architecture.KoArchitectureCreator.assertArchitecture
 import com.lemonappdev.konsist.api.architecture.Layer
+import com.lemonappdev.konsist.api.ext.list.withNameEndingWith
 import com.lemonappdev.konsist.api.ext.list.withPackage
 import com.lemonappdev.konsist.api.verify.assertFalse
+import com.lemonappdev.konsist.api.verify.assertTrue
 import org.junit.jupiter.api.Test
 
 private const val DOMAIN_PACKAGE = "com.rappi.pay.pse.domain"
@@ -38,5 +40,59 @@ class ArchitectureTest {
             .assertFalse {
                 it.hasImport { import -> import.hasNameStartingWith("org.springframework") }
             }
+    }
+
+    @Test
+    fun `output ports should be in domain_port_output`() {
+        Konsist
+            .scopeFromProject()
+            .interfaces()
+            .withNameEndingWith("Port")
+            .assertTrue { it.resideInPackage("$DOMAIN_PACKAGE.port.output") }
+    }
+
+    @Test
+    fun `only ports should be in domain_port_output`() {
+        Konsist
+            .scopeFromProject()
+            .interfaces()
+            .withPackage("$DOMAIN_PACKAGE.port.output")
+            .assertTrue { it.hasNameEndingWith("Port") }
+    }
+
+    @Test
+    fun `service interface should be in domain_port_input`() {
+        Konsist
+            .scopeFromProject()
+            .interfaces()
+            .withNameEndingWith("Service")
+            .assertTrue { it.resideInPackage("$DOMAIN_PACKAGE.port.input") }
+    }
+
+    @Test
+    fun `only service interface should be in domain_port_input`() {
+        Konsist
+            .scopeFromProject()
+            .interfaces()
+            .withPackage("$DOMAIN_PACKAGE.port.input")
+            .assertTrue { it.hasNameEndingWith("Service") }
+    }
+
+    @Test
+    fun `services implementation should be in domain_service`() {
+        Konsist
+            .scopeFromProject()
+            .interfaces()
+            .withNameEndingWith("ServiceImpl")
+            .assertTrue { it.resideInPackage("$DOMAIN_PACKAGE.service") }
+    }
+
+    @Test
+    fun `only Services implementation should be in domain_service`() {
+        Konsist
+            .scopeFromProject()
+            .interfaces()
+            .withPackage("$DOMAIN_PACKAGE.service")
+            .assertTrue { it.hasNameEndingWith("ServiceImpl") }
     }
 }
