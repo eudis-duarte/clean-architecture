@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class ServiceBeanConfig {
     @Bean
-    fun buildPSEPaymentQueryService() = PSEPaymentQueryServiceImpl()
+    fun buildPSEPaymentQueryService(numPayments: Long) = PSEPaymentQueryServiceImpl(numPayments)
 
     @Bean
     fun buildRegisterPSEPaymentService(
