@@ -3,6 +3,8 @@ package com.rappi.pay.pse
 import com.lemonappdev.konsist.api.Konsist
 import com.lemonappdev.konsist.api.architecture.KoArchitectureCreator.assertArchitecture
 import com.lemonappdev.konsist.api.architecture.Layer
+import com.lemonappdev.konsist.api.ext.list.withPackage
+import com.lemonappdev.konsist.api.verify.assertFalse
 import org.junit.jupiter.api.Test
 
 private const val DOMAIN_PACKAGE = "com.rappi.pay.pse.domain"
@@ -24,6 +26,17 @@ class ArchitectureTest {
                 domain.dependsOnNothing()
                 application.dependsOn(domain)
                 infrastructure.dependsOn(domain)
+            }
+    }
+
+    @Test
+    fun `domain should not use spring_framework`() {
+        Konsist
+            .scopeFromProject()
+            .files
+            .withPackage("$DOMAIN_PACKAGE..")
+            .assertFalse {
+                it.hasImport { import -> import.hasNameStartingWith("org.springframework") }
             }
     }
 }
