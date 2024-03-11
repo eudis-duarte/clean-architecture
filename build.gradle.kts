@@ -12,6 +12,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.13.4")
+    testImplementation("com.lemonappdev:konsist:0.13.0")
 }
 
 tasks.test {
