@@ -6,16 +6,20 @@ import com.rappi.pay.pse.domain.port.output.AccountPort
 import com.rappi.pay.pse.domain.port.output.NotificationPort
 import com.rappi.pay.pse.domain.port.output.PSEPaymentPort
 import com.rappi.pay.pse.domain.port.output.UserPort
+import com.rappi.pay.pse.infrastructure.adapter.RedisAdapter
 
 class RegisterPSEPaymentServiceImpl(
     private val psePaymentPort: PSEPaymentPort,
     private val accountPort: AccountPort,
     private val userPort: UserPort,
     private val notificationPort: NotificationPort,
+    private val redisAdapter: RedisAdapter,
 ) : RegisterPSEPaymentService {
     override fun execute(psePayment: PSEPayment): String {
         // Con el id de la cuenta consultar el id del usuario
         val userId = accountPort.getUserId(psePayment.accountId)
+        // salvar el userId en Redis
+        redisAdapter.saveUserId(userId)
         // Con el id del usuario consultar su email
         val email = userPort.getEmail(userId)
         // Registrar el pago en la BD

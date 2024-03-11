@@ -5,6 +5,7 @@ import com.rappi.pay.pse.domain.port.output.AccountPort
 import com.rappi.pay.pse.domain.port.output.NotificationPort
 import com.rappi.pay.pse.domain.port.output.PSEPaymentPort
 import com.rappi.pay.pse.domain.port.output.UserPort
+import com.rappi.pay.pse.infrastructure.adapter.RedisAdapter
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -30,6 +31,9 @@ class RegisterPSEPaymentServiceImplTest {
     @MockK
     private lateinit var notificationPort: NotificationPort
 
+    @MockK
+    private lateinit var redisAdapter: RedisAdapter
+
     @InjectMockKs
     private lateinit var registerPSEPaymentServiceImpl: RegisterPSEPaymentServiceImpl
 
@@ -54,6 +58,7 @@ class RegisterPSEPaymentServiceImplTest {
         every { accountPort.getUserId(accountId) } answers { userId }
         every { userPort.getEmail(userId) } answers { email }
         every { notificationPort.sendEmail(email, subject, body) } answers { }
+        every { redisAdapter.saveUserId(userId) } answers { }
 
         // Act
         val response = registerPSEPaymentServiceImpl.execute(psePayment)
@@ -64,5 +69,6 @@ class RegisterPSEPaymentServiceImplTest {
         verify(exactly = 1) { accountPort.getUserId(any()) }
         verify(exactly = 1) { userPort.getEmail(any()) }
         verify(exactly = 1) { notificationPort.sendEmail(any(), any(), any()) }
+        verify(exactly = 1) { redisAdapter.saveUserId(userId) }
     }
 }
